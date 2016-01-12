@@ -1,11 +1,6 @@
 (function (global) {
-  define('fetch/browser', [ 'ember', 'exports' ], function(Ember, self) {
+  define('ember-network/fetch', [ 'ember', 'exports' ], function(Ember, self) {
     'use strict';
-
-    if (typeof global.XMLHttpRequest === 'undefined') {
-      self['default'] = null;
-      return;
-    }
 
     var Promise = Ember['default'].RSVP.Promise;
     if (global.FormData) {

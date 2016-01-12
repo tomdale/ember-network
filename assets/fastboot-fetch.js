@@ -1,6 +1,5 @@
 (function() {
-  define('fetch/fastboot', [ 'exports' ], function(self) {
-    if (typeof FastBoot === 'undefined') { return; }
+  define('ember-network/fetch', [ 'exports' ], function(self) {
     self['default'] = FastBoot.require('node-fetch');
   });
 })();

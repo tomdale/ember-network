@@ -14,30 +14,17 @@ var Funnel = require('broccoli-funnel');
 module.exports = {
   name: 'ember-network',
 
-  treeForVendor: function(tree) {
-    return mergeTrees([
-      treeForNodeFetch(tree),
-      treeForBrowserFetch(tree)
-    ]);
-  },
+  treeForAddon: function(tree) {
+    var addonTree = this._super.treeForAddon.call(this, tree);
+    var fetchTree;
 
-  included: function(app) {
-    app.import('vendor/node-fetch/fastboot-fetch.js', {
-      exports: {
-        default: [ 'default' ]
-      }
-    });
+    if (isFastBoot()) {
+      fetchTree = treeForNodeFetch();
+    } else {
+      fetchTree = treeForBrowserFetch();
+    }
 
-    app.import('vendor/whatwg-fetch/fetch.js', {
-      exports: {
-        default: [
-          'default',
-          'Headers',
-          'Request',
-          'Response'
-        ]
-      }
-    });
+    return mergeTrees([ addonTree, fetchTree ]);
   }
 };
 
@@ -48,10 +35,14 @@ function expand(input) {
   return dirname + '/{' + file + '}';
 }
 
+function isFastBoot() {
+  return process.env.EMBER_CLI_FASTBOOT === 'true';
+}
+
 function treeForNodeFetch() {
   return new Funnel(path.join(__dirname, './assets'), {
     files: ['fastboot-fetch.js'],
-    destDir: 'node-fetch'
+    destDir: 'reexports'
   });
 }
 
@@ -60,7 +51,7 @@ function treeForBrowserFetch() {
   var expandedFetchPath = expand(fetchPath);
 
   var fetch = rename(find(expandedFetchPath), function() {
-    return 'whatwg-fetch/fetch.js';
+    return 'reexports/fetch.js';
   });
 
   return new Template(fetch, templatePath, function(content) {
