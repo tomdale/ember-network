@@ -34,6 +34,10 @@ module.exports = {
    * from our `vendor` tree into the final built app.
    */
   included: function(app) {
+    if (app.app) {
+      app = app.app;
+    }
+
     app.import('vendor/fetch.js');
   },
 
