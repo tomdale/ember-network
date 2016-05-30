@@ -47,6 +47,7 @@
     "broccoli-stew": "^1.0.4",
     "broccoli-templater": "^1.0.0",
     "ember-cli-babel": "^5.1.5",
+    "ember-cli-import-polyfill": "^0.1.0",
     "node-fetch": "^1.3.3",
     "whatwg-fetch": "^0.11.0"
   },
