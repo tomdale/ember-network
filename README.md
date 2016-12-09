@@ -44,6 +44,46 @@ To see a very simple example app using FastBoot and Ember Network, see:
 
 * [github-fastboot-example](https://github.com/tomdale/github-fastboot-example)
 
+## Testing
+
+Testing requires a new approach because existing tools like Pretender and Mirage rely on `ajax` and `XMLHttpRequest`. Newer browsers have the `fetch` command built in, therefore mocking it is a bit different.
+
+Firstly remove local reference from your `fetch` import statement:
+```js
+import 'ember-network/fetch';
+```
+
+Because we will be mocking the global `fetch`, having a local reference will miss out on the mocked version. Now we are ready for mocking:
+
+```
+ember install fetch-mock ember-browserify
+```
+
+Now, inside of any acceptance tests, you can mock any network traffic with ease:
+
+```js
+// ...
+import fetchMock from 'npm:fetch-mock';
+
+// ...
+
+test('visiting /', function(assert) {
+  fetchMock.get('/users/1', {
+    'data': {
+      'type': 'user',
+      'id': '1',
+      'attributes': {
+        // ...
+      }
+    }
+  });
+
+  visit('/');
+  
+  // ...
+});
+```
+
 ## How It Works
 
 At build time, Ember Network detects if the build target is FastBoot or
