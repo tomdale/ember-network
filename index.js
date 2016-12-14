@@ -1,6 +1,9 @@
 /* jshint node: true */
 'use strict';
 
+// Polyfill the Addon.import() method introduced by ember-cli@2.7.0
+require('ember-cli-import-polyfill');
+
 /*
  * The `index.js` file is the main entry point for all Ember CLI addons.  The
  * object we export from this file is turned into an Addon class
@@ -33,8 +36,8 @@ module.exports = {
    * which allows us to use the `import()` method to tell it to include a file
    * from our `vendor` tree into the final built app.
    */
-  included: function(app) {
-    app.import('vendor/fetch.js');
+  included: function() {
+    this.import('vendor/fetch.js');
   },
 
   /*
