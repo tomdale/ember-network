@@ -56,7 +56,8 @@ import 'ember-network/fetch';
 Because we will be mocking the global `fetch`, having a local reference will miss out on the mocked version. Now we are ready for mocking:
 
 ```
-ember install fetch-mock ember-browserify
+npm install fetch-mock
+ember install ember-browserify
 ```
 
 Now, inside of any acceptance tests, you can mock any network traffic with ease:
