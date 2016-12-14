@@ -34,6 +34,8 @@ module.exports = {
    * from our `vendor` tree into the final built app.
    */
   included: function(app) {
+    app = recursivelyFindApp(app);
+
     app.import('vendor/fetch.js');
   },
 
@@ -130,3 +132,9 @@ function expand(input) {
   return dirname + '/{' + file + '}';
 }
 
+function recursivelyFindApp(app) {
+  if (app.import) {
+    return app;
+  }
+  return recursivelyFindApp(app.app);
+}
