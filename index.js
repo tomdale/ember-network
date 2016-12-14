@@ -34,7 +34,16 @@ module.exports = {
    * from our `vendor` tree into the final built app.
    */
   included: function(app) {
-    app.import('vendor/fetch.js');
+    app.import('vendor/fetch.js', {
+      exports: {
+        default: [
+          'default',
+          'Headers',
+          'Request',
+          'Response'
+        ]
+      }
+    });
   },
 
   /*
