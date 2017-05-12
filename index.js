@@ -1,6 +1,11 @@
 /* jshint node: true */
 'use strict';
 
+const path = require('path');
+
+const map = require('broccoli-stew').map;
+const MergeTrees = require('broccoli-merge-trees');
+
 /*
  * The `index.js` file is the main entry point for all Ember CLI addons.  The
  * object we export from this file is turned into an Addon class
@@ -46,16 +51,19 @@ module.exports = {
    * not. Based on that, we return a tree that contains the correct version of
    * the polyfill at the `vendor/fetch.js` path.
    */
-  treeForVendor: function() {
-    if (isFastBoot()) {
-      return treeForNodeFetch();
-    } else {
-      return treeForBrowserFetch();
-    }
+  treeForVendor: function(vendorTree) {
+    let browserTree = treeForBrowserFetch();
+    browserTree = map(browserTree, (content) => `if (typeof FastBoot === 'undefined') { ${content} }`);
+    return new MergeTrees([vendorTree, browserTree]);
+  },
+
+  //add node version of fetch.js into fastboot package.json manifest vendorFiles array
+  updateFastBootManifest: function(manifest) {
+    manifest.vendorFiles.push('ember-network/fastboot-fetch.js');
+    return manifest;
   }
 };
 
-var path = require('path');
 
 // We use a few different Broccoli plugins to build our trees:
 //
@@ -71,41 +79,24 @@ var path = require('path');
 //   * rename - renames files in a tree
 //   * find - finds files in a tree based on a glob pattern
 
-var Template = require('broccoli-templater');
-var funnel = require('broccoli-funnel');
-var stew = require('broccoli-stew');
-var rename = stew.rename;
-var find = stew.find;
+const Template = require('broccoli-templater');
+const stew = require('broccoli-stew');
+const rename = stew.rename;
+const find = stew.find;
 
 // Path to the template that contains the shim wrapper around the browser
 // polyfill
-var templatePath = path.resolve(__dirname + '/assets/module-template.js.t');
+const templatePath = path.resolve(__dirname + '/assets/module-template.js.t');
 
-// Checks to see whether this build is targeting FastBoot. Note that we cannot
-// check this at boot time--the environment variable is only set once the build
-// has started, which happens after this file is evaluated.
-function isFastBoot() {
-  return process.env.EMBER_CLI_FASTBOOT === 'true';
-}
-
-// Returns a shim file from the assets directory and renames it to the
-// normalized `fetch.js`. That shim file calls `FastBoot.require`, which allows
-// you to require node modules (in this case `node-fetch`) in FastBoot mode.
-function treeForNodeFetch() {
-  return normalizeFileName(funnel(path.join(__dirname, './assets'), {
-    files: ['fastboot-fetch.js'],
-  }));
-}
 
 // Returns a tree containing the browser polyfill (from
 // `node_modules/whatwg-fetch`), wrapped in a shim that stops it from exporting
 // a global and instead turns it into a module that can be used by the Ember
 // app.
 function treeForBrowserFetch() {
-  var fetchPath = require.resolve('whatwg-fetch');
-  var expandedFetchPath = expand(fetchPath);
-
-  var fetch = normalizeFileName(find(expandedFetchPath));
+  const fetchPath = require.resolve('whatwg-fetch');
+  const expandedFetchPath = expand(fetchPath);
+  let fetch = normalizeFileName(find(expandedFetchPath));
 
   return new Template(fetch, templatePath, function(content) {
     return {
@@ -124,9 +115,8 @@ function normalizeFileName(tree) {
 }
 
 function expand(input) {
-  var dirname = path.dirname(input);
-  var file = path.basename(input);
+  const dirname = path.dirname(input);
+  const file = path.basename(input);
 
   return dirname + '/{' + file + '}';
 }
-
