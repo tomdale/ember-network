@@ -1,15 +1,27 @@
 # ember-network
 
+## 🔥 Deprecation Notice 🔥
+
+**ember-network is deprecated in favor of [ember-fetch][ember-fetch].**
+
+Originally, ember-network was created to contain implementations of multiple
+networking primitives that worked in both the browser and Node.js. However,
+given the rapid adoption of the [WHATWG Fetch][whatwg-fetch] and FastBoot's
+built-in support for the jQuery AJAX-like [najax][najax], there is little reason
+for `ember-network` to continue to exist.
+
+You should be able to seamlessly switch to [ember-fetch], which uses the same
+underlying `fetch` polyfills.
+
+[najax]: https://github.com/najaxjs/najax
+[ember-fetch]: https://github.com/ember-cli/ember-fetch
+
+<strike>
+
 Ember Network provides low-level networking primitives that work both in
 the browser and in Node.js via [FastBoot][fastboot].
 
 [fastboot]: https://github.com/tildeio/ember-cli-fastboot
-
-## Installation
-
-In your Ember app or addon, run:
-
-* `ember install ember-network`
 
 ## Usage
 
@@ -17,7 +29,6 @@ Currently, Ember Network implements the [WHATWG Fetch][whatwg-fetch]
 standard. Other standards may be implemented in the future.
 
 [whatwg-fetch]: https://fetch.spec.whatwg.org
-
 ### Fetch
 
 ```js
@@ -99,3 +110,4 @@ your `vendor.js` file.
 
 If you'd like to write an Ember addon that does something similar,
 [please see the annotated index.js file](index.js).
+</strike>
